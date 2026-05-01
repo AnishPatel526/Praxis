@@ -1,0 +1,14 @@
+- generic [ref=e3]:
+  - generic [ref=e4]: "[plugin:vite:import-analysis] Failed to resolve import \"tslib\" from \"node_modules/.vite/deps/@radix-ui_react-dialog.js?v=d00817fd\". Does the file exist?"
+  - generic [ref=e5]: /Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/.vite/deps/@radix-ui_react-dialog.js:7:49
+  - generic [ref=e6]: "5 | import { a as useLayoutEffect2, c as composeEventHandlers, i as dispatchDiscreteCustomEvent, n as useCallbackRef$1, o... 6 | import { t as require_react_dom } from \"./react-dom.js\"; 7 | import { __assign, __rest, __spreadArray } from \"tslib\"; | ^ 8 | //#region node_modules/@radix-ui/react-id/dist/index.mjs 9 | var import_react = /* @__PURE__ */ __toESM(require_react(), 1);"
+  - generic [ref=e7]: at TransformPluginContext._formatLog (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:30375:39) at TransformPluginContext.error (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:30372:14) at normalizeUrl (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:27654:18) at async file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:27717:30 at async Promise.all (index 5) at async TransformPluginContext.transform (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:27685:4) at async EnvironmentPluginContainer.transform (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:30164:14) at async loadAndTransform (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:24512:26) at async viteTransformMiddleware (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:24306:20)
+  - generic [ref=e8]:
+    - text: Click outside, press Esc key, or fix the code to dismiss.
+    - text: You can also disable this overlay by setting
+    - code [ref=e9]: server.hmr.overlay
+    - text: to
+    - code [ref=e10]: "false"
+    - text: in
+    - code [ref=e11]: vite.config.ts
+    - text: .

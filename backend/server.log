@@ -1,0 +1,23 @@
+[2026-05-01T13:49:12.033Z] INFO  payment-service started on port 8080 (env=production version=2.4.1)
+[2026-05-01T13:49:12.041Z] INFO  Stripe client initialized — live mode
+[2026-05-01T13:49:12.055Z] INFO  Connected to PostgreSQL payments-db-prod.us-east-1.internal
+[2026-05-01T13:54:03.201Z] WARN  AuthMiddleware: token age 3089ms exceeds soft limit 3000ms — customer=cus_Px9fK1 trace_id=4bf92f3577b34da6
+[2026-05-01T13:54:03.204Z] WARN  stripe.customers.retrieve latency=3102ms (p99 threshold: 3000ms)
+[2026-05-01T13:58:41.774Z] WARN  AuthMiddleware: token age 3201ms exceeds soft limit 3000ms — customer=cus_Px9fK1 trace_id=7c3a1d9e22b8f041
+[2026-05-01T13:58:41.779Z] WARN  stripe.customers.retrieve latency=3289ms (p99 threshold: 3000ms)
+[2026-05-01T14:02:09.551Z] ERROR AuthMiddleware: FATAL token validation failure
+  TypeError: Cannot read properties of undefined (reading 'id')
+    at validatePaymentToken (auth/middleware.ts:47:23)
+    at Layer.handle [as handle_request] (express/router/layer.js:95:5)
+    at next (express/router/route.js:149:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+[2026-05-01T14:02:09.552Z] ERROR Caused by: stripe.customers.retrieve() returned null
+  customer_id : cus_Px9fK1
+  token_age   : 3847ms
+  max_allowed : 3000ms
+  delta       : +847ms over threshold
+  trace_id    : 4bf92f3577b34da6a3ce929d0e0e4736
+  span_id     : 00f067aa0ba902b7
+  host        : payments-prod-07.us-east-1.internal
+[2026-05-01T14:02:09.555Z] ERROR Build #2847 aborted — test phase exit code 1
+[2026-05-01T14:02:09.560Z] INFO  Incident INC-4821 opened — pagerduty alert dispatched
