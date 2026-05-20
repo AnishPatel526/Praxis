@@ -59,3 +59,50 @@ Praxis is a cloud-native architecture built entirely on Google Cloud infrastruct
    ```bash
    git clone [https://github.com/your-username/praxis-sre.git](https://github.com/your-username/praxis-sre.git)
    cd praxis-sre
+   ```
+
+2. **Authenticate with Google Cloud:**
+   Praxis uses zero-trust Application Default Credentials (ADC). You must have the `gcloud` CLI installed.
+   ```bash
+   gcloud auth application-default login
+   
+   # Optional: If impersonating a specific service account
+   # gcloud auth application-default login --impersonate-service-account=praxis-backend@your-project-id.iam.gserviceaccount.com
+   ```
+
+3. **Set Environment Variables:**
+   ```bash
+   cp .env.example .env
+   ```
+   *Required variables: `GCP_PROJECT_ID` and `SLACK_WEBHOOK_URL`.*
+
+4. **Start the Environment:**
+   ```bash
+   # Terminal 1: Initialize the API & Agent Orchestrator
+   cd backend
+   npm install
+   npm run dev
+   
+   # Terminal 2: Initialize the Web Dashboard
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+## 🎯 Triggering a Simulation (War Games)
+
+You do not need to crash a real server to test Praxis. We have built a "War Games" simulation route that artificially injects a simulated timeout into the pipeline so you can watch the agents react.
+
+Once the servers are running, trigger the simulation:
+```bash
+curl -X POST http://localhost:3000/api/wargames/initiate
+```
+
+**What to watch for:**
+1. Check the backend terminal to watch the **Coordinator** synthesize the patch.
+2. Watch the terminal output as the **Governance Board** (Security, FinOps, Architecture) concurrently audits the code.
+3. Check your configured Slack channel for the final ChatOps webhook payload.
+4. Click **Approve & Merge** in Slack to trigger the Vector Memory storage and Zero-Touch Post-Mortem generation.
+
+---
+*Built for the 2026 Hackathon. Redefining Enterprise Reliability.*
