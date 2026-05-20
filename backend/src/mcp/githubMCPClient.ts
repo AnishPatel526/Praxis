@@ -12,11 +12,15 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
+export interface FileChange {
+  filePath: string;
+  fileContent: string; // plain text
+}
+
 interface GitHubPRParams {
   owner: string;
   repo: string;
-  filePath: string;
-  patchedContent: string; // plain text — encoded to base64 here before calling MCP
+  files: FileChange[];
   branchName: string;
   baseBranch: string;
   commitMessage: string;
@@ -28,6 +32,14 @@ interface GitHubPRResult {
   prUrl: string;
   prNumber: number;
   branchName: string;
+}
+
+export interface MultiFileCommitParams {
+  owner: string;
+  repo: string;
+  branchName: string;
+  files: FileChange[];
+  commitMessage: string;
 }
 
 function buildGitHubTransport(): StdioClientTransport {
@@ -78,6 +90,56 @@ export async function verifyGitHubMCPServer(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Multi-file commit — push N files to an existing branch in one atomic commit
+//
+// Uses push_files which calls the GitHub Git Database tree API under the hood:
+//   get ref → create blobs → create tree → create commit → update ref
+// ---------------------------------------------------------------------------
+
+export async function commitMultipleFiles(
+  params: MultiFileCommitParams
+): Promise<void> {
+  const { owner, repo, branchName, files, commitMessage } = params;
+
+  const client = await connectGitHubClient();
+
+  try {
+    console.log(
+      `[GitHub MCP] push_files — ${files.length} file(s) → ${owner}/${repo}@${branchName}`
+    );
+    await client.callTool({
+      name: "push_files",
+      arguments: {
+        owner,
+        repo,
+        branch: branchName,
+        files: files.map((f) => ({ path: f.filePath, content: f.fileContent })),
+        message: commitMessage,
+      },
+    });
+    console.log(`[GitHub MCP] Commit pushed — "${commitMessage}"`);
+  } finally {
+    await client.close();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Single-file convenience wrapper (used by selfHealingAgent)
+// ---------------------------------------------------------------------------
+
+export async function commitFileToExistingBranch(params: {
+  owner: string;
+  repo: string;
+  branchName: string;
+  filePath: string;
+  fileContent: string;
+  commitMessage: string;
+}): Promise<void> {
+  const { filePath, fileContent, ...rest } = params;
+  await commitMultipleFiles({ ...rest, files: [{ filePath, fileContent }] });
+}
+
+// ---------------------------------------------------------------------------
 // PR Creation — three-step MCP tool sequence
 // ---------------------------------------------------------------------------
 
@@ -85,7 +147,7 @@ export async function createPullRequestViaMCP(
   params: GitHubPRParams
 ): Promise<GitHubPRResult> {
   const {
-    owner, repo, filePath, patchedContent,
+    owner, repo, files,
     branchName, baseBranch, commitMessage, prTitle, prBody,
   } = params;
 
@@ -99,19 +161,16 @@ export async function createPullRequestViaMCP(
       arguments: { owner, repo, branch: branchName, from_branch: baseBranch },
     });
 
-    // Step 2: Commit the patched file to the new branch
-    // GitHub API requires content as base64
-    const base64Content = Buffer.from(patchedContent, "utf-8").toString("base64");
-    console.log(`[GitHub MCP] Step 2/3 — create_or_update_file: ${filePath}`);
+    // Step 2: Commit all files in a single atomic push via the Git tree API
+    console.log(`[GitHub MCP] Step 2/3 — push_files: ${files.length} file(s)`);
     await client.callTool({
-      name: "create_or_update_file",
+      name: "push_files",
       arguments: {
         owner,
         repo,
-        path: filePath,
-        message: commitMessage,
-        content: base64Content,
         branch: branchName,
+        files: files.map((f) => ({ path: f.filePath, content: f.fileContent })),
+        message: commitMessage,
       },
     });
 

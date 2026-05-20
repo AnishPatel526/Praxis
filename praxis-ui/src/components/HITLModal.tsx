@@ -8,13 +8,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MOCK_DIFF, INCIDENT, PATCH_SUBMISSION, type SecurityReview } from "@/data/mockData";
+import { MOCK_DIFF, INCIDENT, PATCH_SUBMISSION, TARGET_GITLAB_PROJECT, type SecurityReview, type FileChange } from "@/data/mockData";
 
 interface HITLModalProps {
   open: boolean;
   onApprove: (prUrl: string) => void;
   onCancel: () => void;
   securityReview?: SecurityReview;
+  files?: FileChange[];
+}
+
+function fileContentToDiff(filePath: string, content: string): string {
+  const header = `diff --git a/${filePath} b/${filePath}\n--- /dev/null\n+++ b/${filePath}`;
+  const body = content.split("\n").map((l) => `+${l}`).join("\n");
+  return `${header}\n${body}`;
 }
 
 type ApproveState = "idle" | "loading" | "error";
@@ -84,7 +91,7 @@ function SecurityReviewBanner({ review }: { review: SecurityReview }) {
   );
 }
 
-export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLModalProps) {
+export function HITLModal({ open, onApprove, onCancel, securityReview, files }: HITLModalProps) {
   const [approveState, setApproveState] = useState<ApproveState>("idle");
   const [approveError, setApproveError] = useState<string | null>(null);
 
@@ -121,7 +128,16 @@ export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLMod
     onCancel();
   };
 
-  const lines = MOCK_DIFF.split("\n");
+  // Use live multi-file payload when available; fall back to mock single-file diff
+  const displayFiles: Array<{ path: string; diffLines: string[] }> =
+    files && files.length > 0
+      ? files.map((f) => ({
+          path: f.filePath,
+          diffLines: fileContentToDiff(f.filePath, f.fileContent).split("\n"),
+        }))
+      : [{ path: "auth/middleware.ts", diffLines: MOCK_DIFF.split("\n") }];
+
+  const fileCount = displayFiles.length;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleCancel()}>
@@ -150,8 +166,8 @@ export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLMod
             Proposed Action
           </div>
           <p className="text-[#E0E0E0] text-sm leading-relaxed">
-            Submit pull request to{" "}
-            <span className="text-[#00FF6A]">{INCIDENT.repo}</span> fixing the
+            Submit merge request to{" "}
+            <span className="text-[#00FF6A]">{TARGET_GITLAB_PROJECT}</span> fixing the
             race condition in{" "}
             <span className="text-[#F5A623]">auth/middleware.ts</span>. Increases
             token TTL from 3 000 ms to 8 000 ms and adds retry logic with
@@ -162,7 +178,7 @@ export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLMod
             {[
               ["RISK", "LOW", "text-[#00FF6A]"],
               ["TESTS", "14 / 14", "text-[#00FF6A]"],
-              ["FILES", "1 changed", "text-[#E0E0E0]"],
+              ["FILES", `${fileCount} changed`, "text-[#E0E0E0]"],
             ].map(([label, val, color]) => (
               <div key={label} className="border border-[#1E1E1E] px-3 py-2 bg-[#0F0F0F]">
                 <div className="text-[#4A4A4A] text-[9px] tracking-widest mb-1">{label}</div>
@@ -172,24 +188,32 @@ export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLMod
           </div>
         </div>
 
-        {/* Diff view */}
+        {/* Diff view — one block per file */}
         <div className="border-b border-[#1E1E1E]">
-          <div className="px-4 py-2 bg-[#0F0F0F] border-b border-[#1E1E1E] flex items-center justify-between">
-            <span className="text-[#4A4A4A] text-[10px] tracking-widest uppercase">
-              auth/middleware.ts
-            </span>
-            <div className="flex items-center gap-3 text-[10px]">
-              <span className="text-[#00FF6A]">+12</span>
-              <span className="text-[#FF3B30]">−3</span>
-            </div>
-          </div>
-          <ScrollArea className="h-48 bg-[#070707]">
-            <div className="py-1">
-              {lines.map((line, i) => (
-                <DiffLine key={i} line={line} />
-              ))}
-            </div>
-          </ScrollArea>
+          {displayFiles.map((file, fileIdx) => {
+            const added = file.diffLines.filter((l) => l.startsWith("+") && !l.startsWith("+++")).length;
+            const removed = file.diffLines.filter((l) => l.startsWith("-") && !l.startsWith("---")).length;
+            return (
+              <div key={fileIdx} className={fileIdx < displayFiles.length - 1 ? "border-b border-[#1E1E1E]" : ""}>
+                <div className="px-4 py-2 bg-[#0F0F0F] flex items-center justify-between">
+                  <span className="text-[#4A4A4A] text-[10px] tracking-widest uppercase">
+                    {file.path}
+                  </span>
+                  <div className="flex items-center gap-3 text-[10px]">
+                    {added > 0 && <span className="text-[#00FF6A]">+{added}</span>}
+                    {removed > 0 && <span className="text-[#FF3B30]">−{removed}</span>}
+                  </div>
+                </div>
+                <ScrollArea className="h-40 bg-[#070707]">
+                  <div className="py-1">
+                    {file.diffLines.map((line, i) => (
+                      <DiffLine key={i} line={line} />
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            );
+          })}
         </div>
 
         {/* Submission error banner */}
@@ -208,7 +232,7 @@ export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLMod
         {/* Action buttons */}
         <div className="px-5 py-4 flex items-center justify-between bg-[#0A0A0A]">
           <p className="text-[#3A3A3A] text-[10px] max-w-xs leading-relaxed">
-            This action will create a pull request via GitHub MCP. You are
+            This action will create a GitLab Merge Request. You are
             responsible for final review before merge.
           </p>
           <div className="flex items-center gap-3">
@@ -239,7 +263,7 @@ export function HITLModal({ open, onApprove, onCancel, securityReview }: HITLMod
               ) : approveState === "error" ? (
                 "Retry"
               ) : (
-                "Approve PR"
+                "Approve MR"
               )}
             </Button>
           </div>

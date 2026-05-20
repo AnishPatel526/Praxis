@@ -4,6 +4,7 @@ import { IncidentCard } from "@/components/IncidentCard";
 import { CognitiveStream } from "@/components/CognitiveStream";
 import { HITLModal } from "@/components/HITLModal";
 import { A2UIRenderer } from "@/components/A2UIRenderer";
+import { LandingPage } from "@/components/LandingPage";
 import { Button } from "@/components/ui/button";
 import {
   A2UI_PAYLOADS,
@@ -27,6 +28,7 @@ interface TriggerResponse {
 }
 
 export default function App() {
+  const [view, setView] = useState<"landing" | "dashboard">("landing");
   const [stepIndex, setStepIndex] = useState(0);
   const [payloadIndex, setPayloadIndex] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -161,9 +163,13 @@ export default function App() {
       ? backendPayload
       : A2UI_PAYLOADS[payloadIndex];
 
+  if (view === "landing") {
+    return <LandingPage onEnterDashboard={() => setView("dashboard")} />;
+  }
+
   return (
     <div className="flex flex-col h-screen bg-[#070707] text-[#E0E0E0] font-mono overflow-hidden">
-      <TopBar stepIndex={stepIndex} totalSteps={totalSteps} />
+      <TopBar stepIndex={stepIndex} totalSteps={totalSteps} onGoHome={() => setView("landing")} />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Main workspace */}
@@ -223,14 +229,14 @@ export default function App() {
             }`}>
               <div className="text-xs font-bold tracking-widest uppercase mb-1">
                 {postApprovalState === "approved"
-                  ? "✓ Pull Request Submitted"
+                  ? "✓ Merge Request Submitted"
                   : "✗ Operation Cancelled"}
               </div>
               <div className="text-[10px] opacity-70">
                 {postApprovalState === "approved" ? (
                   prUrl ? (
                     <span>
-                      PR submitted at{" "}
+                      MR opened at{" "}
                       <a
                         href={prUrl}
                         target="_blank"
@@ -239,10 +245,10 @@ export default function App() {
                       >
                         {prUrl}
                       </a>
-                      {" "}· Awaiting CI run and code review.
+                      {" "}· Awaiting pipeline run and code review.
                     </span>
                   ) : (
-                    "PR opened at acme-corp/payments · Awaiting CI run and code review."
+                    "MR opened at AnishPatel526/praxis-test · Awaiting pipeline run and code review."
                   )
                 ) : (
                   "No changes were made. The incident remains open for manual review."
@@ -292,6 +298,7 @@ export default function App() {
         onApprove={handleApprove}
         onCancel={handleCancel}
         securityReview={backendPayload?.securityReview}
+        files={backendPayload?.files}
       />
     </div>
   );

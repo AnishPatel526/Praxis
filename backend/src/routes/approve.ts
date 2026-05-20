@@ -1,72 +1,76 @@
 import { Router, type Request, type Response } from "express";
-import { createPullRequestViaMCP } from "../mcp/githubMCPClient.js";
+import { createMergeRequestViaGitLab } from "../mcp/gitlabClient.js";
+import { generatePostMortem } from "../services/postMortemAgent.js";
 
 const router = Router();
 
 interface ApproveRequestBody {
-  owner: string;
-  repo: string;
-  filePath: string;
-  patchedContent: string;
+  incidentId?: string;
+  project: string;       // GitLab "namespace/project"
+  files: Array<{ filePath: string; fileContent: string }>;
   branchName: string;
-  baseBranch: string;
+  targetBranch: string;
   commitMessage: string;
-  prTitle: string;
-  prBody: string;
+  mrTitle: string;
+  mrDescription: string;
 }
 
 /**
  * POST /api/agent/approve
  *
- * Executes the GitHub MCP tool sequence to submit the patch as a PR:
- *   1. create_branch
- *   2. create_or_update_file
- *   3. create_pull_request
+ * GitLab flow: create_branch → commit files (actions API) → create_merge_request
+ *
+ * After a successful MR, asynchronously generates a post-mortem and writes it
+ * to backend/docs/post-mortems/{incidentId}.md (non-blocking).
  */
 router.post("/", async (req: Request, res: Response) => {
   const body = req.body as ApproveRequestBody;
 
   const {
-    owner = "acme-corp",
-    repo = "payments",
-    filePath,
-    patchedContent,
+    incidentId = "INC-UNKNOWN",
+    project = "acme-corp/payments",
+    files,
     branchName,
-    baseBranch = "main",
+    targetBranch = "main",
     commitMessage,
-    prTitle,
-    prBody,
+    mrTitle,
+    mrDescription,
   } = body;
 
-  if (!filePath || !patchedContent || !branchName || !prTitle) {
+  if (!files?.length || !branchName || !mrTitle) {
     res.status(400).json({
       success: false,
-      error: "Missing required fields: filePath, patchedContent, branchName, prTitle",
+      error: "Missing required fields: files, branchName, mrTitle",
     });
     return;
   }
 
-  console.log(`[Praxis] Approve triggered — repo=${owner}/${repo} branch=${branchName}`);
+  console.log(`[Praxis] Approve triggered — project=${project} branch=${branchName} files=${files.length}`);
 
   try {
-    const result = await createPullRequestViaMCP({
-      owner,
-      repo,
-      filePath,
-      patchedContent,
+    const result = await createMergeRequestViaGitLab({
+      project,
+      files,
       branchName,
-      baseBranch,
-      commitMessage: commitMessage ?? `fix: ${prTitle}`,
-      prTitle,
-      prBody: prBody ?? "",
+      targetBranch,
+      commitMessage: commitMessage ?? `fix: ${mrTitle}`,
+      mrTitle,
+      mrDescription: mrDescription ?? "",
     });
 
     res.json({
       success: true,
-      prUrl: result.prUrl,
-      prNumber: result.prNumber,
+      prUrl: result.mrUrl,   // keep key as prUrl — App.tsx reads this field
+      mrUrl: result.mrUrl,
+      mrIid: result.mrIid,
       branchName: result.branchName,
     });
+
+    generatePostMortem(incidentId, files, result.mrUrl).catch((err) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[PostMortem] Generation failed (non-fatal): ${msg}`);
+    });
+
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`[Praxis] Approve error: ${message}`);
