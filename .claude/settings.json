@@ -1,0 +1,9 @@
+{
+  "enabledPlugins": {
+    "pinecone@claude-plugins-official": true
+  },
+    "attribution": {
+      "commit": "",
+      "pr": ""
+    }
+}

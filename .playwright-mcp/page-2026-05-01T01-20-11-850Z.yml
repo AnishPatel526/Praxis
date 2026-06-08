@@ -1,0 +1,14 @@
+- generic [ref=e3]:
+  - generic [ref=e4]: "[plugin:vite:import-analysis] Failed to resolve import \"@/components/ui/button\" from \"src/App.tsx\". Does the file exist?"
+  - generic [ref=e5]: /Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/src/App.tsx:7:23
+  - generic [ref=e6]: "5 | import { HITLModal } from \"@/components/HITLModal\"; 6 | import { A2UIRenderer } from \"@/components/A2UIRenderer\"; 7 | import { Button } from \"@/components/ui/button\"; | ^ 8 | import { A2UI_PAYLOADS, STREAM_EVENTS_SEQUENCE } from \"@/data/mockData\"; 9 | import \"./index.css\";"
+  - generic [ref=e7]: at TransformPluginContext._formatLog (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:30375:39) at TransformPluginContext.error (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:30372:14) at normalizeUrl (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:27654:18) at async file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:27717:30 at async Promise.all (index 6) at async TransformPluginContext.transform (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:27685:4) at async EnvironmentPluginContainer.transform (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:30164:14) at async loadAndTransform (file:///Users/anishpatel/GoogleHackathon/Praxis/praxis-ui/node_modules/vite/dist/node/chunks/node.js:24512:26)
+  - generic [ref=e8]:
+    - text: Click outside, press Esc key, or fix the code to dismiss.
+    - text: You can also disable this overlay by setting
+    - code [ref=e9]: server.hmr.overlay
+    - text: to
+    - code [ref=e10]: "false"
+    - text: in
+    - code [ref=e11]: vite.config.ts
+    - text: .

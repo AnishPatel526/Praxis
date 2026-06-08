@@ -1,0 +1,239 @@
+- generic:
+  - generic:
+    - generic:
+      - banner:
+        - generic:
+          - generic: PRAXIS
+          - generic: │
+          - generic: DevOps Intelligence
+        - generic:
+          - generic: payment-service
+          - generic: /
+          - generic: main
+          - generic: /
+          - generic: "BUILD #2847"
+        - generic:
+          - generic:
+            - generic: AWAITING REVIEW
+          - generic: │
+          - generic: 21:41:59
+      - generic:
+        - generic:
+          - generic:
+            - generic: Workspace
+            - generic: MOCKED
+          - generic:
+            - generic:
+              - generic:
+                - generic: FAILED
+                - generic: │
+                - generic: INC-4821
+              - generic: 14m ago
+            - generic:
+              - generic:
+                - generic: payment-service
+                - generic: main
+              - generic:
+                - generic:
+                  - generic: BUILD
+                  - generic: "#2847"
+                - generic:
+                  - generic: COMMIT
+                  - generic: a7f3c91
+                - generic:
+                  - generic: REPO
+                  - generic: payments
+                - generic:
+                  - generic: BRANCH
+                  - generic: main
+          - generic:
+            - generic:
+              - generic: Agent Output
+              - generic: A2UI · JSON→COMPONENT
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: PATCH READY
+                  - generic: VERIFIED
+                - generic:
+                  - heading [level=2]: PATCH VERIFIED — REVIEW REQUIRED
+                - generic:
+                  - paragraph: "Root cause confirmed via trace INC-4821: race condition between Stripe token TTL (3000ms) and p99 latency of customers.retrieve() under load. A fix has been generated and validated in sandbox. 14/14 tests pass. Human approval required before submitting pull request."
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Confidence
+                      - generic: 94%
+                    - generic:
+                      - generic: Pattern
+                      - generic: Race condition
+                    - generic:
+                      - generic: File
+                      - generic: auth/middleware.ts:47
+                    - generic:
+                      - generic: Tests
+                      - generic: 14 / 14 passed
+                    - generic:
+                      - generic: Files changed
+                      - generic: "1"
+                    - generic:
+                      - generic: Lines
+                      - generic: +12 / −3
+          - generic:
+            - button: ⚠ Review Patch
+            - button: Reset
+        - generic:
+          - generic:
+            - generic:
+              - generic: Cognitive Stream
+              - generic:
+                - generic: "11"
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Build failure alert received
+                          - generic: 14:02:11
+                        - generic:
+                          - generic: INC-4821 · payment-service
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Initializing Coordinator Agent
+                          - generic: 14:02:12
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Connecting to Datadog MCP
+                          - generic: 14:02:14
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Retrieving telemetry logs
+                          - generic: 14:02:15
+                        - generic:
+                          - generic: MCP
+                          - generic: Querying last 2h of traces
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Connecting to GitHub MCP
+                          - generic: 14:02:19
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Reading repository issues & context
+                          - generic: 14:02:21
+                        - generic:
+                          - generic: MCP
+                          - generic: acme-corp/payments · 3 open issues
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Synthesizing root cause
+                          - generic: 14:02:24
+                        - generic:
+                          - generic: Reflection Agent active
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Generating code patch
+                          - generic: 14:02:28
+                        - generic:
+                          - generic: Generator + Critic pattern
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: Running sandbox verification
+                          - generic: 14:02:31
+                        - generic:
+                          - generic: Secure code execution environment
+                    - generic:
+                      - generic: ✓
+                      - generic:
+                        - generic:
+                          - generic: "Sandbox: all 14 tests passed"
+                          - generic: 14:02:38
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: Awaiting human approval
+                          - generic: 14:02:39
+                        - generic:
+                          - generic: HITL override required
+            - generic:
+              - generic:
+                - generic: ▶
+                - generic: Awaiting human approval
+  - dialog "Human Approval Required" [ref=e124]:
+    - generic [ref=e126]:
+      - heading "Human Approval Required" [level=2] [ref=e129]
+      - generic [ref=e130]: HITL — SUGGEST & CONFIRM
+    - generic [ref=e131]:
+      - generic [ref=e132]: Proposed Action
+      - paragraph [ref=e133]: Submit pull request to acme-corp/payments fixing the race condition in auth/middleware.ts. Increases token TTL from 3 000 ms to 8 000 ms and adds retry logic with exponential backoff.
+      - generic [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e136]: RISK
+          - generic [ref=e137]: LOW
+        - generic [ref=e138]:
+          - generic [ref=e139]: TESTS
+          - generic [ref=e140]: 14 / 14
+        - generic [ref=e141]:
+          - generic [ref=e142]: FILES
+          - generic [ref=e143]: 1 changed
+    - generic [ref=e144]:
+      - generic [ref=e145]:
+        - generic [ref=e146]: auth/middleware.ts
+        - generic [ref=e147]:
+          - generic [ref=e148]: "+12"
+          - generic [ref=e149]: −3
+      - generic [ref=e153]:
+        - generic [ref=e154]: diff --git a/auth/middleware.ts b/auth/middleware.ts
+        - generic [ref=e155]: index a7f3c91..b2e4d12 100644
+        - generic [ref=e156]: "-- a/auth/middleware.ts"
+        - generic [ref=e157]: ++ b/auth/middleware.ts
+        - generic [ref=e158]: "@@ -42,12 +42,21 @@ import { stripe } from '../config/stripe';"
+        - generic [ref=e160]: export async function validatePaymentToken(
+        - generic [ref=e161]: "token: string,"
+        - generic [ref=e162]: "− maxAge: number = 3000"
+        - generic [ref=e163]: "+ maxAge: number = 8000"
+        - generic [ref=e164]: "): Promise<boolean> {"
+        - generic [ref=e165]: const tokenAge = Date.now() - decodeTokenTimestamp(token);
+        - generic [ref=e167]: "− if (tokenAge > maxAge) {"
+        - generic [ref=e168]: − throw new TypeError('Payment token TTL expired');
+        - generic [ref=e169]: "− }"
+        - generic [ref=e170]: "+ if (tokenAge > maxAge) {"
+        - generic [ref=e171]: "+ logger.warn(`Token age ${tokenAge}ms exceeds maxAge ${maxAge}ms`);"
+        - generic [ref=e172]: "+ throw new TypeError(`Payment token TTL expired after ${tokenAge}ms`);"
+        - generic [ref=e173]: "+ }"
+        - generic [ref=e175]: − const customer = await stripe.customers.retrieve(
+        - generic [ref=e176]: − extractCustomerId(token)
+        - generic [ref=e177]: − );
+        - generic [ref=e178]: + const customer = await retryWithBackoff(
+        - generic [ref=e179]: + () => stripe.customers.retrieve(extractCustomerId(token)),
+        - generic [ref=e180]: "+ { maxRetries: 3, baseDelay: 200, factor: 2 }"
+        - generic [ref=e181]: + );
+        - generic [ref=e183]: return customer !== null && customer.id !== undefined;
+        - generic [ref=e184]: "}"
+    - generic [ref=e185]:
+      - paragraph [ref=e186]: This action will create a pull request. You are responsible for final review before merge.
+      - generic [ref=e187]:
+        - button "Cancel" [active] [ref=e188] [cursor=pointer]
+        - button "Approve PR" [ref=e189] [cursor=pointer]
+    - button "Close" [ref=e190] [cursor=pointer]:
+      - img [ref=e191]
+      - generic [ref=e194]: Close

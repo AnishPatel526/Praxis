@@ -1,0 +1,5 @@
+[      72ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/App.tsx:0
+[   24765ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/App.tsx:0
+[   87507ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Outdated Optimize Dep) @ http://localhost:5173/node_modules/.vite/deps/tailwind-merge.js?v=0cdfdd75:0
+[   87522ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=0b0a3afb:0
+[   87638ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=d00817fd:0
